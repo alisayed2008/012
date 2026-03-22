@@ -6,488 +6,327 @@
   <title>Instagram Mirror Customizer</title>
   <style>
     :root {
-      --bg: #c7c7c9;
-      --panel-bg: #f9f9fa;
-      --post-bg: #fdfdfd;
+      --bg: #bfbfc1;
+      --paper: #f4f5f7;
       --ink: #111;
-      --muted: #7d7d80;
-      --link: #1864a3;
-      --blue: #6aa7db;
-      --accent-grad: linear-gradient(130deg, #f9c450 0%, #f77737 25%, #e1306c 55%, #8a3ab9 80%, #405de6 100%);
-      --surface-border: 1.5px;
-      --radius-xl: 28px;
-      --radius-md: 16px;
-      --radius-sm: 10px;
-      --font: "Cairo", "Segoe UI", Tahoma, Arial, sans-serif;
+      --muted: #808387;
+      --link: #1c5f97;
+      --line: #222;
+      --ui: #d8dde3;
+      --ui-border: #5d9ac9;
+      --ig: linear-gradient(125deg,#f9c452 0%,#f77a3b 26%,#e1306c 55%,#9b3bc9 80%,#4460e6 100%);
+      --font: "Cairo","Segoe UI",Tahoma,Arial,sans-serif;
     }
 
     * { box-sizing: border-box; font-family: var(--font); }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
-    body { background: var(--bg); color: var(--ink); }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+    button, input { font: inherit; }
 
-    .page {
+    .desktop {
       width: 100vw;
       height: 100vh;
+      padding: 14px;
       display: grid;
-      grid-template-columns: 27% 43% 30%;
-      gap: 18px;
-      padding: 16px;
+      grid-template-columns: minmax(320px, 30vw) minmax(450px, 43vw) minmax(300px, 27vw);
+      gap: 14px;
+      align-items: stretch;
+      direction: ltr;
     }
 
-    .grad-frame {
-      position: relative;
-      border-radius: var(--radius-xl);
-      background: var(--accent-grad);
-      padding: var(--surface-border);
+    .grad-wrap {
+      background: var(--ig);
+      padding: 1.2px;
+      border-radius: 30px;
       overflow: hidden;
+      min-height: 0;
     }
-    .grad-frame > .inner {
-      background: var(--panel-bg);
-      border-radius: calc(var(--radius-xl) - 2px);
+    .grad-wrap > .inner {
+      background: var(--paper);
+      border-radius: 29px;
       width: 100%;
       height: 100%;
+      min-height: 0;
     }
 
-    .custom-panel .inner {
-      padding: 14px 18px;
+    /* LEFT PANEL */
+    .left-panel .inner {
+      padding: 12px 16px;
       display: grid;
       grid-template-rows: auto auto auto auto auto auto 1fr;
-      gap: 10px;
-    }
-
-    .title { margin: 0; text-align: center; font-size: clamp(20px, 2.2vw, 42px); line-height: 1.1; }
-    .subline { margin: 0; font-size: 14px; text-align: center; color: #3a3a3c; }
-
-    .profile-upload {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      gap: 10px;
-    }
-    .profile-preview {
-      text-align: center;
-      color: #9ea0a4;
-    }
-    .profile-circle {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      margin: 4px auto 8px;
-      border: 2px solid transparent;
-      background: linear-gradient(#d7dbe0, #d7dbe0) padding-box, var(--accent-grad) border-box;
-      display: grid;
-      place-items: center;
+      gap: 8px;
+      direction: rtl;
       overflow: hidden;
     }
-    .profile-circle img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .profile-circle img.show { display: block; }
+    .h-main {
+      margin: 0;
+      text-align: center;
+      font-size: clamp(24px, 2vw, 42px);
+      line-height: 1.1;
+      font-weight: 700;
+    }
+    .profile-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    .preview-box { text-align: center; color: #989ca1; }
+    .preview-pic {
+      width: 100px; height: 100px; border-radius: 50%; margin: 4px auto;
+      background: linear-gradient(#d6dade,#d6dade) padding-box, var(--ig) border-box;
+      border: 2px solid transparent;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+    .preview-pic img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .preview-pic img.show { display: block; }
 
-    .btn, .input, .toggle-btn {
-      border: 1px solid #5e98c8;
-      background: #d8dde3;
+    .btn-pill, .input-pill {
+      width: 100%;
+      height: 38px;
       border-radius: 999px;
-      min-height: 40px;
-      font-size: clamp(17px, 1.35vw, 42px);
-      color: #5d6064;
+      border: 1px solid var(--ui-border);
+      background: var(--ui);
+      color: #5f6368;
+      text-align: center;
+      font-size: clamp(16px, 1.3vw, 30px);
       outline: none;
     }
-    .btn { cursor: pointer; padding: 0 20px; }
-    .btn:hover { filter: brightness(0.97); }
-    .btn:active { transform: translateY(1px); }
+    .btn-pill { cursor: pointer; }
+    .input-pill { padding: 0 10px; direction: ltr; }
 
-    .input {
+    .hint { margin: 0; font-size: 12px; text-align: center; line-height: 1.2; }
+    .hint small { font-size: inherit; }
+    .hint em { text-decoration: underline; font-style: italic; }
+    .hint button { border: 0; background: transparent; color: var(--link); text-decoration: underline; cursor: pointer; }
+
+    hr { border: 0; border-top: 1px solid var(--line); margin: 2px 0; }
+
+    .num-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; direction: ltr; }
+    .num-col { text-align: center; direction: rtl; }
+    .num-label { margin: 0 0 2px; font-size: clamp(13px, .95vw, 19px); line-height: 1.08; }
+    .num-input-wrap { display: grid; grid-template-columns: 16px 1fr; gap: 4px; align-items: center; direction: ltr; }
+    .num-arrows { display: grid; line-height: .72; font-weight: 700; }
+    .num-arrows button { border: 0; background: transparent; cursor: pointer; font-size: 17px; padding: 0; }
+
+    .input-rect {
       width: 100%;
-      padding: 0 14px;
-      direction: ltr;
+      height: 44px;
+      border: 1px solid var(--ui-border);
+      background: #cfd4da;
+      border-radius: 0;
+      color: #606468;
       text-align: center;
-    }
-    .input.square { border-radius: 0; }
-    .hint { margin: 2px 0 0; font-size: 13px; text-align: center; }
-    .hint.link-like button {
-      color: var(--link); border: 0; background: transparent; text-decoration: underline; cursor: pointer;
-      padding: 0; font-size: inherit;
-    }
-    hr {
-      border: 0;
-      border-top: 1px solid #222;
-      margin: 4px 0;
-    }
-
-    .two-cols {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .num-group { text-align: center; }
-    .num-group .label { font-size: clamp(13px, 1vw, 26px); line-height: 1.1; margin: 0 0 4px; }
-    .num-control {
-      display: grid;
-      grid-template-columns: 16px 1fr;
-      gap: 6px;
-      align-items: center;
       direction: ltr;
+      outline: none;
+      padding: 0 10px;
+      font-size: clamp(15px, 1.2vw, 24px);
     }
-    .num-arrows {
-      display: grid;
-      grid-auto-rows: 1fr;
-      line-height: 0.8;
-      font-weight: 700;
-      user-select: none;
-      text-align: center;
-    }
-    .num-arrows button {
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-      font-size: 18px;
-      padding: 0;
-      color: #111;
-      line-height: 0.75;
-    }
+    .under-title { text-decoration: underline; text-align: right; margin: 0; font-size: clamp(17px, 1.35vw, 25px); }
 
-    .tags-grid { display: grid; gap: 6px; }
+    .tag-stack { display: grid; gap: 4px; }
     .tag-row { display: grid; grid-template-columns: 1fr auto auto; gap: 4px; }
-    .mini-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 1px solid #5e98c8;
-      background: #e9eff5;
-      color: #1b70b7;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      font-weight: 700;
-      padding: 0;
+    .circle-btn {
+      width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--ui-border); background: #edf3f8;
+      color: #1f73b5; cursor: pointer; font-weight: 700; display: grid; place-items: center; padding: 0;
     }
 
-    .post-wrap {
-      display: grid;
-      place-items: center;
-    }
+    /* POST */
+    .center { display: grid; place-items: center; }
     .post {
-      width: min(88%, 700px);
-      height: calc(100vh - 56px);
-      max-height: 1120px;
-      border: 1.4px solid transparent;
-      background: linear-gradient(var(--post-bg), var(--post-bg)) padding-box, var(--accent-grad) border-box;
-      padding: 18px 22px;
-      position: relative;
+      width: min(92%, 640px);
+      height: min(92vh, 1000px);
+      background: linear-gradient(#f3f3f4,#f3f3f4) padding-box, var(--ig) border-box;
+      border: 1.3px solid transparent;
+      padding: 14px 16px;
       overflow: hidden;
-    }
-
-    .post-header {
-      direction: ltr;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: start;
-      gap: 10px;
-    }
-    .post-profile {
-      width: 66px;
-      height: 66px;
-      border-radius: 50%;
-      padding: 2px;
-      background: var(--accent-grad);
       position: relative;
+      direction: ltr;
     }
-    .post-profile.no-story { background: #c0c3c8; }
-    .post-profile img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 3px solid #f5f5f6;
-      object-fit: cover;
+    .post-head {
+      display: grid; grid-template-columns: auto 1fr auto; align-items: start; gap: 10px;
     }
-    .head-txt { align-self: center; }
-    .head-txt .name { font-weight: 700; font-size: clamp(18px, 1.5vw, 34px); }
-    .head-txt .loc { font-size: clamp(13px, 1.1vw, 22px); color: #222; }
-
-    .more-btn {
-      border: 0;
-      background: transparent;
-      font-size: 42px;
-      line-height: 0.7;
-      color: #93959a;
-      cursor: pointer;
-      padding: 0 6px;
+    .post-avatar {
+      width: 58px; height: 58px; border-radius: 50%; background: var(--ig); padding: 1.6px;
     }
+    .post-avatar.no-story { background: #bfc3c7; }
+    .post-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid #f4f5f7; }
+    .u-name { font-size: clamp(18px, 1.65vw, 30px); font-weight: 700; line-height: 1; margin-top: 6px; }
+    .u-place { font-size: clamp(13px, 1vw, 18px); line-height: 1.1; }
+    .more { border: 0; background: transparent; color: #94979c; font-size: 38px; line-height: .7; cursor: pointer; }
 
     .mirror {
-      margin: 18px auto 14px;
-      width: 78%;
-      aspect-ratio: 1 / 1.2;
-      background: linear-gradient(180deg, #cee3f1 0%, #75b8e9 55%, #2f99e3 100%);
-      display: grid;
-      place-items: center;
-      color: #47a1e4;
-      text-align: center;
-      font-size: clamp(32px, 4vw, 74px);
-      line-height: 1.25;
+      width: 75%; aspect-ratio: 1 / 1.18; margin: 12px auto;
+      background: linear-gradient(180deg,#cde2f1 0%,#7dbbe8 58%,#349ee6 100%);
+      color: #44a0e5; display: grid; place-items: center; text-align: center;
+      font-size: clamp(28px, 3.6vw, 58px); line-height: 1.2;
       user-select: none;
     }
 
     .actions {
-      direction: ltr;
+      display: grid; grid-template-columns: auto auto auto 1fr auto; gap: 12px; align-items: center;
+      margin: 2px 0 4px;
+    }
+    .i-btn { width: 50px; height: 50px; border: 0; background: transparent; cursor: pointer; padding: 3px; }
+    .i-btn img { width: 100%; height: 100%; object-fit: contain; }
+
+    .txt { font-size: clamp(20px, 1.7vw, 31px); line-height: 1.18; }
+    .likes { margin: 0 0 4px; }
+    .shop { color: var(--link); margin-right: 5px; }
+    .hashes span { color: var(--link); margin-right: 4px; }
+    .comments { color: var(--muted); }
+    .editable { outline: none; padding: 0 2px; border-radius: 4px; }
+    .editable:focus { background: #eaf3fb; }
+
+    .eye-overlay { position: absolute; inset: 0; pointer-events: none; }
+    .eye-overlay img { width: 34px; height: 34px; opacity: .55; display: none; position: absolute; }
+
+    /* RIGHT */
+    .right {
       display: grid;
-      grid-template-columns: auto auto auto 1fr auto;
-      align-items: center;
-      gap: 14px;
-      margin: 8px 0;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 10px;
+      direction: rtl;
+      min-height: 0;
     }
-    .icon-btn {
-      border: 0;
-      background: transparent;
-      width: 56px;
-      height: 56px;
-      padding: 4px;
-      cursor: pointer;
-    }
-    .icon-btn img { width: 100%; height: 100%; object-fit: contain; }
-
-    .post-txt { direction: ltr; font-size: clamp(22px, 1.85vw, 36px); }
-    .likes { margin: 4px 0 8px; }
-    .caption-line { line-height: 1.15; }
-    .caption-line .shop { color: var(--link); margin-right: 6px; }
-    .hashtags span { color: var(--link); margin-right: 6px; }
-    .comments { color: var(--muted); margin-top: 3px; }
-    .editable { outline: none; border-radius: 4px; padding: 0 2px; }
-    .editable:focus { background: #eef5fb; }
-
-    .hide-overlay {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      display: none;
-    }
-    .hidden-mark {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      opacity: 0.55;
-      display: none;
-    }
-
-    .right-column {
-      display: grid;
-      grid-template-rows: auto auto 1fr auto auto;
-      gap: 12px;
-      align-content: start;
-    }
-
-    .hide-card {
+    .hide-panel {
+      border: 1px solid #4e8fc2;
+      background: #eef6fd;
+      padding: 8px;
       position: relative;
-      border: 1px solid #4d8dc1;
-      background: #eef6fd;
-      padding: 10px;
-      transition: transform .25s ease, opacity .25s ease;
+      transition: transform .2s ease;
     }
-    .hide-card.collapsed {
-      transform: translateX(88%);
-      opacity: 0.8;
+    .hide-panel.collapsed { transform: translateX(87%); }
+    .hide-head { display: grid; grid-template-columns: auto 1fr; align-items: center; margin-bottom: 4px; }
+    .hide-title { margin: 0; font-size: clamp(20px,1.55vw,28px); text-decoration: underline; }
+    .x-btn { border: 0; background: transparent; color: #1f73b5; font-size: 20px; cursor: pointer; }
+    .tri {
+      position: absolute; left: -20px; top: 50%; transform: translateY(-50%);
+      width: 20px; height: 40px; border: 1px solid #4e8fc2; border-right: 0; background: #eef6fd;
+      clip-path: polygon(100% 0,0 50%,100% 100%); cursor: pointer;
     }
-    .hide-header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .hide-title { margin: 0; font-size: clamp(18px, 1.6vw, 28px); }
-    .close-x {
-      border: 0;
-      background: transparent;
-      color: #1f73b5;
-      cursor: pointer;
-      font-size: 22px;
-      line-height: 1;
-    }
-    .triangle-toggle {
-      position: absolute;
-      left: -22px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 22px;
-      height: 44px;
-      border: 1px solid #4d8dc1;
-      border-right: 0;
-      background: #eef6fd;
-      clip-path: polygon(100% 0, 0 50%, 100% 100%);
-      cursor: pointer;
-    }
-    .hide-card.collapsed .triangle-toggle { clip-path: polygon(0 0, 100% 50%, 0 100%); left: -20px; }
+    .hide-panel.collapsed .tri { clip-path: polygon(0 0,100% 50%,0 100%); }
 
     .toggle-row {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 8px;
-      align-items: center;
-      font-size: clamp(15px, 1.1vw, 22px);
-      margin-bottom: 4px;
+      display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center;
+      font-size: clamp(14px,1vw,20px);
     }
+    .toggle-row .en { text-align: left; direction: ltr; }
     .switch {
-      width: 52px;
-      height: 24px;
-      border-radius: 999px;
-      border: 1px solid #5f9acc;
-      background: #d2deea;
-      position: relative;
-      cursor: pointer;
+      width: 50px; height: 22px; border-radius: 999px; border: 1px solid var(--ui-border);
+      background: #d4e1ed; position: relative; cursor: pointer;
     }
     .switch::after {
-      content: "";
-      width: 18px;
-      height: 18px;
-      background: #6ea8d6;
-      border-radius: 50%;
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      transition: transform .18s ease;
+      content:""; width: 16px; height: 16px; border-radius: 50%; background: #6fa7d5;
+      position: absolute; top: 2px; left: 2px; transition: transform .18s ease, background .18s ease;
     }
-    .switch.on::after { transform: translateX(28px); background: #f45f74; }
+    .switch.on::after { transform: translateX(28px); background: #f15f75; }
 
-    .extract { text-align: center; }
-    .extract .grad-frame { padding: 1.2px; border-radius: 20px; }
-    .extract .inner {
-      border-radius: 19px;
-      display: grid;
-      grid-template-columns: 55% 45%;
-      align-items: center;
-      min-height: 66px;
-      padding: 0 10px;
+    .extract-title { margin: 0; text-align: center; line-height: 1.2; font-size: clamp(23px,2vw,36px); }
+    .extract-box { background: var(--ig); border-radius: 19px; padding: 1.2px; }
+    .extract-inner {
+      background: var(--paper); border-radius: 18px; padding: 7px;
+      display: grid; grid-template-columns: 54% 46%; align-items: center; gap: 6px;
     }
 
-    .actions-bottom { margin-top: auto; }
-    .action-btn {
-      width: 100%;
-      height: 74px;
-      border: 1px solid #1ed22f;
-      background: #88d587;
-      color: #fff;
-      font-size: clamp(32px, 2.4vw, 52px);
-      cursor: pointer;
+    .bottom-actions { margin-top: auto; }
+    .big-btn {
+      width: 100%; height: 70px; border: 1px solid #1cd62a; cursor: pointer;
+      color: #fff; font-size: clamp(30px,2.2vw,46px);
     }
-    .save-btn {
-      background: #7075c0;
-      border-color: #39e63e;
-      margin-bottom: 8px;
-    }
+    .save { background: #7477c4; margin-bottom: 8px; }
+    .buy { background: #8fd18f; }
+    .terms { margin: 2px 0 0; text-align: center; font-size: 13px; }
+    .terms button { border: 0; background: transparent; color: #2f67b1; text-decoration: underline; cursor: pointer; }
 
-    .terms-note { text-align: center; margin: 4px 0 0; }
-    .terms-note button { border: 0; background: transparent; color: #2c66b2; text-decoration: underline; cursor: pointer; }
+    /* mobile */
+    .mobile { display: none; }
 
     .toast {
-      position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #1f1f22;
-      color: #fff;
-      border-radius: 12px;
-      padding: 10px 22px;
-      transition: transform .3s ease;
+      position: fixed; left: 50%; bottom: 14px; transform: translate(-50%,90px);
+      background: #1f2024; color: #fff; border-radius: 10px; padding: 9px 18px; transition: transform .25s ease;
       z-index: 20;
     }
-    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.show { transform: translate(-50%,0); }
 
-    .modal {
-      position: fixed;
-      inset: 0;
-      display: none;
-      background: #0006;
-      place-items: center;
-      z-index: 30;
-      padding: 20px;
-    }
+    .modal { position: fixed; inset: 0; background: #0007; display: none; place-items: center; z-index: 25; padding: 14px; }
     .modal.show { display: grid; }
     .modal-card {
-      background: #fff;
-      width: min(560px, 95vw);
-      border-radius: 16px;
-      padding: 16px;
+      width: min(550px, 95vw); background: #fff; border-radius: 14px; padding: 14px; direction: rtl;
     }
 
-    .mobile-root { display: none; }
-
-    @media (max-width: 999px) {
-      .page { display: none; }
-      .mobile-root {
+    @media (max-width: 980px) {
+      .desktop { display: none; }
+      .mobile {
         display: grid;
         grid-template-rows: auto 1fr auto;
         height: 100vh;
         overflow: hidden;
-        padding: 10px;
-        gap: 8px;
-      }
-      .mobile-root .extract { direction: rtl; }
-      .mobile-root .post {
-        width: min(95vw, 620px);
-        height: auto;
-        min-height: 44vh;
-        max-height: 56vh;
-      }
-      .mobile-bottom {
-        height: 34vh;
-      }
-      .mobile-bottom .inner {
-        display: grid;
-        grid-template-columns: 34% 32% 34%;
-        gap: 8px;
         padding: 8px;
-        font-size: 13px;
+        gap: 8px;
       }
-      .mob-col { overflow: hidden; display: grid; align-content: start; gap: 6px; }
-      .mobile-bottom hr.v { border: 0; border-left: 1px solid #111; height: 100%; margin: 0; }
-      .small { min-height: 30px; font-size: 13px; }
-      .hide-card { border: 1px solid #4d8dc1; padding: 4px; background: #eef6fd; }
-      .hide-header, .close-x, .triangle-toggle { display: none; }
+      .mobile .extract-title { font-size: 24px; }
+      .mobile-post .post {
+        width: min(95vw, 520px);
+        height: min(54vh, 620px);
+      }
+      .mobile-bottom { height: 33vh; }
+      .mobile-bottom .inner {
+        display: grid; grid-template-columns: 34% 32% 34%; gap: 8px; padding: 8px;
+      }
+      .m-col { overflow: hidden; display: grid; gap: 5px; align-content: start; }
+      .m-v { border: 0; border-left: 1px solid #111; margin: 0; height: 100%; }
+      .m-sm { height: 30px !important; font-size: 13px !important; }
+      .hide-head, .tri { display: none; }
+      .hide-panel { padding: 4px; }
+      .big-btn { height: 40px; font-size: 20px; }
     }
   </style>
 </head>
 <body>
-  <main class="page" id="desktopPage">
-    <section class="grad-frame custom-panel">
+  <!-- Desktop -->
+  <main class="desktop" id="desktopRoot">
+    <section class="grad-wrap left-panel">
       <div class="inner">
-        <h1 class="title">تفاصيل التخصيص</h1>
+        <h1 class="h-main">تفاصيل التخصيص</h1>
 
-        <div class="profile-upload">
+        <div class="profile-row">
           <div>
-            <button class="btn" id="uploadBtn" type="button">Upload</button>
-            <input type="file" id="profileInput" accept="image/*" hidden />
-            <p class="hint link-like">ارفع الصورة المراد وضعها او <button type="button">استخرجها عن طريق اسم المستخدم</button></p>
-            <input class="input" id="usernameInput" placeholder="user_name" />
-            <p class="hint" style="text-decoration: underline; font-style: italic;">ضع الاسم بشكل صحيح</p>
+            <button class="btn-pill" id="uploadBtn" type="button">Upload</button>
+            <input type="file" id="profileInput" accept="image/*" hidden>
+            <p class="hint">ارفع الصورة المراد وضعها او <button type="button">استخرجها عن طريق اسم المستخدم</button></p>
+            <input class="input-pill" id="usernameInput" placeholder="user_name">
+            <p class="hint"><em>ضع الاسم بشكل صحيح</em></p>
           </div>
-          <div class="profile-preview">
+          <div class="preview-box">
             <small>ستظهر الصورة هنا</small>
-            <div class="profile-circle"><img id="sidePreviewImg" alt="profile" /></div>
-            <div id="sideName">سيظهر الاسم هنا</div>
+            <div class="preview-pic"><img id="sideAvatar" alt="profile"></div>
+            <div id="sideName" style="font-size:31px;">سيظهر الاسم هنا</div>
           </div>
         </div>
 
         <hr>
 
-        <div class="two-cols">
-          <div class="num-group">
-            <p class="label">عدد التعليقات<br>Number of comments</p>
-            <div class="num-control">
-              <div class="num-arrows">
-                <button type="button" data-target="comments" data-step="500">˄</button>
-                <button type="button" data-target="comments" data-step="-500">˅</button>
-              </div>
-              <input class="input" id="commentsInput" value="5k" />
-            </div>
-          </div>
-
-          <div class="num-group">
-            <p class="label">عدد الإعجابات<br>Number of likes</p>
-            <div class="num-control">
+        <div class="num-grid">
+          <div class="num-col">
+            <p class="num-label">عدد الإعجابات<br>Number of likes</p>
+            <div class="num-input-wrap">
               <div class="num-arrows">
                 <button type="button" data-target="likes" data-step="500">˄</button>
                 <button type="button" data-target="likes" data-step="-500">˅</button>
               </div>
-              <input class="input" id="likesInput" value="9.5k" />
+              <input class="input-pill" id="likesInput" value="9.5k">
+            </div>
+          </div>
+          <div class="num-col">
+            <p class="num-label">عدد التعليقات<br>Number of comments</p>
+            <div class="num-input-wrap">
+              <div class="num-arrows">
+                <button type="button" data-target="comments" data-step="500">˄</button>
+                <button type="button" data-target="comments" data-step="-500">˅</button>
+              </div>
+              <input class="input-pill" id="commentsInput" value="5k">
             </div>
           </div>
         </div>
@@ -495,175 +334,178 @@
         <hr>
 
         <div>
-          <p class="subline" style="text-decoration: underline; text-align:right;">اكتب العنوان المراد</p>
-          <input class="input square" id="captionInput" placeholder="Caption" />
+          <p class="under-title">اكتب العنوان المراد</p>
+          <input class="input-rect" id="captionInput" placeholder="Caption">
           <p class="hint">يفضل الا يتجاوز الخمس كلمات</p>
         </div>
 
         <hr>
 
         <div>
-          <p class="subline" style="text-decoration: underline; text-align:right;">اكتب الهاشتاج المراد</p>
-          <div class="tags-grid" id="tagInputs"></div>
+          <p class="under-title">اكتب الهاشتاج المراد</p>
+          <div class="tag-stack" id="tagInputs"></div>
           <p class="hint">لا يمكن وضع اكثر من 5 علامات هاش</p>
         </div>
 
         <hr>
 
         <div>
-          <p class="subline" style="text-decoration: underline; text-align:right;">المكان/الموسيقى</p>
+          <p class="under-title">المكان/الموسيقى</p>
           <div class="tag-row">
-            <input class="input square" id="locationInput" placeholder="Example: Egypt, Cairo" />
-            <button class="mini-btn" id="locationModeBtn" type="button">✕</button>
+            <input class="input-rect" id="locationInput" placeholder="Example: Egypt, Cairo">
+            <button class="circle-btn" id="locationMode" type="button">✕</button>
           </div>
           <div class="tag-row">
-            <input class="input square" id="musicInput" placeholder="Example: TUL8TE • LA3BALY FE DMA" />
-            <button class="mini-btn" id="musicModeBtn" type="button">＋</button>
+            <input class="input-rect" id="musicInput" placeholder="Example: TUL8TE • LA3BALY FE DMAGHY">
+            <button class="circle-btn" id="musicMode" type="button">＋</button>
           </div>
           <p class="hint">يمكنك اختيار مكان او موسيقى لا يمكن وضع الخيارين</p>
         </div>
       </div>
     </section>
 
-    <section class="post-wrap">
+    <section class="center">
       <article class="post" id="post">
-        <div class="post-header">
-          <div class="post-profile" id="postStoryRing"><img id="postProfileImg" alt="profile"></div>
-          <div class="head-txt">
-            <div class="name" id="postUsername">user name</div>
-            <div class="loc editable" id="postLocation" contenteditable="true">Title, music</div>
+        <div class="post-head">
+          <div class="post-avatar" id="storyRing"><img id="postAvatar" alt="avatar"></div>
+          <div>
+            <div class="u-name" id="postUser">user name</div>
+            <div class="u-place editable" id="postLocation" contenteditable="true">Title, music</div>
           </div>
-          <button class="more-btn" id="moreBtn" type="button">⋮</button>
+          <button class="more" id="moreBtn" type="button">⋮</button>
         </div>
 
-        <div class="mirror" id="mirrorBlock">مراية<br>Mirror</div>
+        <div class="mirror">مراية<br>Mirror</div>
 
         <div class="actions">
-          <button class="icon-btn"><img src="assets/icons/like.svg" alt="like"></button>
-          <button class="icon-btn"><img src="assets/icons/comment.svg" alt="comment"></button>
-          <button class="icon-btn"><img src="assets/icons/share.svg" alt="share"></button>
+          <button class="i-btn"><img src="assets/icons/like.svg" alt="like"></button>
+          <button class="i-btn"><img src="assets/icons/comment.svg" alt="comment"></button>
+          <button class="i-btn"><img src="assets/icons/share.svg" alt="share"></button>
           <span></span>
-          <button class="icon-btn"><img src="assets/icons/save.svg" alt="save"></button>
+          <button class="i-btn"><img src="assets/icons/save.svg" alt="save"></button>
         </div>
 
-        <div class="post-txt">
+        <div class="txt">
           <div class="likes"><span class="editable" id="postLikes" contenteditable="true">9.5k</span> Likes</div>
-          <div class="caption-line">
+          <div>
             <span class="editable" id="postCaption" contenteditable="true">The caption</span>
             <span class="shop">@t_sign.shop</span>
-            <span class="hashtags" id="postHashtags"></span>
-            <button class="mini-btn" id="postTagAdd" type="button">＋</button>
-            <button class="mini-btn" id="postTagRemove" type="button" hidden>✕</button>
+            <span class="hashes" id="postHashes"></span>
+            <button class="circle-btn" id="postTagAdd" type="button">＋</button>
+            <button class="circle-btn" id="postTagRemove" type="button" hidden>✕</button>
           </div>
-          <div class="comments">View All <span class="editable" id="postComments" contenteditable="true">5k</span> Comments</div>
+          <div class="comments" id="viewAllLine">View All <span class="editable" id="postComments" contenteditable="true">5k</span> Comments</div>
         </div>
 
-        <div class="hide-overlay" id="hideOverlay">
-          <img class="hidden-mark" id="markStory" style="top:12px;left:6px" src="assets/icons/hidden-eye.svg" alt="hidden">
-          <img class="hidden-mark" id="markHash" style="bottom:112px;left:8px" src="assets/icons/hidden-eye.svg" alt="hidden">
-          <img class="hidden-mark" id="markMore" style="top:14px;right:12px" src="assets/icons/hidden-eye.svg" alt="hidden">
-          <img class="hidden-mark" id="markComments" style="bottom:70px;left:8px" src="assets/icons/hidden-eye.svg" alt="hidden">
-          <img class="hidden-mark" id="markViewAll" style="bottom:26px;left:8px" src="assets/icons/hidden-eye.svg" alt="hidden">
-          <img class="hidden-mark" id="markAddress" style="top:66px;left:178px" src="assets/icons/hidden-eye.svg" alt="hidden">
+        <div class="eye-overlay" id="eyeOverlay">
+          <img id="eyeStory" src="assets/icons/hidden-eye.svg" alt="hidden" style="top:8px;left:8px;">
+          <img id="eyeHash" src="assets/icons/hidden-eye.svg" alt="hidden" style="left:8px;bottom:96px;">
+          <img id="eyeMore" src="assets/icons/hidden-eye.svg" alt="hidden" style="right:8px;top:8px;">
+          <img id="eyeComments" src="assets/icons/hidden-eye.svg" alt="hidden" style="left:8px;bottom:34px;">
+          <img id="eyeViewall" src="assets/icons/hidden-eye.svg" alt="hidden" style="left:8px;bottom:8px;">
+          <img id="eyeAddress" src="assets/icons/hidden-eye.svg" alt="hidden" style="left:140px;top:52px;">
         </div>
       </article>
     </section>
 
-    <aside class="right-column">
-      <div class="hide-card" id="hideCard">
-        <button class="triangle-toggle" id="triangleToggle" type="button" aria-label="toggle panel"></button>
-        <div class="hide-header">
+    <aside class="right">
+      <div class="hide-panel" id="hidePanel">
+        <button class="tri" id="togglePanel" type="button" aria-label="toggle"></button>
+        <div class="hide-head">
+          <button class="x-btn" id="hideClose" type="button">✕</button>
           <h3 class="hide-title">إخفاء/اظهار</h3>
-          <button class="close-x" id="hideClose" type="button">✕</button>
         </div>
         <div id="toggleRows"></div>
       </div>
 
-      <section class="extract">
-        <h2 class="title" style="font-size: clamp(22px, 2vw, 38px);">Extracting data from Instagram<br>استخراج البيانات من الإنستجرام</h2>
-        <div class="grad-frame">
-          <div class="inner">
-            <p class="hint" style="margin:0; text-align:right; font-size:22px; text-decoration: underline;">ضع الاسم بشكل صحيح<br>كما موضح في انستجرام</p>
-            <input class="input" id="extractInput" placeholder="user_name">
+      <section>
+        <h2 class="extract-title">Extracting data from Instagram<br>استخراج البيانات من الإنستجرام</h2>
+        <div class="extract-box">
+          <div class="extract-inner">
+            <p class="hint" style="text-align:right; font-size:22px; text-decoration: underline;">ضع الاسم بشكل صحيح<br>كما موضح في انستجرام</p>
+            <input class="input-pill" id="extractInput" placeholder="user_name">
           </div>
         </div>
       </section>
 
-      <div class="actions-bottom">
-        <button class="action-btn save-btn" id="saveDesignBtn" type="button">حفظ</button>
-        <button class="action-btn" id="buyBtn" type="button">شراء</button>
-        <p class="terms-note">يجب مراعاه <button type="button" id="termsBtn">شروط التخصيص</button></p>
+      <div></div>
+
+      <div class="bottom-actions">
+        <button class="big-btn save" id="saveBtn" type="button">حفظ</button>
+        <button class="big-btn buy" id="buyBtn" type="button">شراء</button>
+        <p class="terms">يجب مراعاه <button type="button" id="termsBtn">شروط التخصيص</button></p>
       </div>
     </aside>
   </main>
 
-  <main class="mobile-root" id="mobilePage">
-    <section class="extract">
-      <h2 class="title" style="font-size: 28px;">Extracting data from Instagram<br>استخراج البيانات من الإنستجرام</h2>
-      <div class="grad-frame"><div class="inner"><input class="input small" placeholder="user_name"><p class="hint">ضع الاسم بشكل صحيح</p></div></div>
+  <!-- Mobile -->
+  <main class="mobile">
+    <section>
+      <h2 class="extract-title">Extracting data from Instagram<br>استخراج البيانات من الإنستجرام</h2>
+      <div class="extract-box"><div class="extract-inner"><p class="hint">ضع الاسم بشكل صحيح</p><input class="input-pill m-sm" placeholder="user_name"></div></div>
     </section>
 
-    <section class="post-wrap"><article class="post" id="postMobileClone"></article></section>
+    <section class="mobile-post center"><article class="post" id="mobilePost"></article></section>
 
-    <section class="grad-frame mobile-bottom"><div class="inner">
-      <div class="mob-col">
-        <p class="subline" style="text-decoration: underline; text-align:right;">اكتب العنوان المراد</p>
-        <input class="input square small" placeholder="Caption">
+    <section class="grad-wrap mobile-bottom"><div class="inner">
+      <div class="m-col">
+        <p class="under-title" style="font-size:14px;">اكتب العنوان المراد</p>
+        <input class="input-rect m-sm" placeholder="Caption">
         <hr>
-        <p class="subline" style="text-decoration: underline; text-align:right;">اكتب الهاشتاج المراد</p>
-        <input class="input square small" placeholder="Hashtag">
+        <p class="under-title" style="font-size:14px;">اكتب الهاشتاج المراد</p>
+        <input class="input-rect m-sm" placeholder="Hashtag">
         <hr>
-        <div class="two-cols" style="gap:6px;">
-          <div><small>عدد التعليقات</small><input class="input small" value="5k"></div>
-          <div><small>عدد الإعجابات</small><input class="input small" value="9.5k"></div>
-        </div>
+        <small>عدد الإعجابات / التعليقات</small>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"><input class="input-pill m-sm" value="9.5k"><input class="input-pill m-sm" value="5k"></div>
       </div>
-      <hr class="v">
-      <div class="mob-col">
-        <button class="btn small">Upload</button>
-        <input class="input small" placeholder="user_name">
+      <hr class="m-v">
+      <div class="m-col">
+        <button class="btn-pill m-sm">Upload</button>
+        <input class="input-pill m-sm" placeholder="user_name">
         <hr>
-        <small style="text-align:center; text-decoration: underline;">المكان/الموسيقى</small>
-        <input class="input square small" placeholder="Example: Egypt, Cairo">
-        <input class="input square small" placeholder="Example: TUL8TE • LA3BALY FE DMA">
+        <small style="text-decoration:underline;text-align:center;">المكان/الموسيقى</small>
+        <input class="input-rect m-sm" placeholder="Example: Egypt, Cairo">
+        <input class="input-rect m-sm" placeholder="Example: TUL8TE • LA3BALY FE DMAGHY">
       </div>
-      <hr class="v">
-      <div class="mob-col">
-        <div class="hide-card" style="position:static;">
-          <h3 class="hide-title" style="font-size:17px; text-align:center; margin-bottom:4px;">إخفاء/اظهار copy</h3>
+      <hr class="m-v">
+      <div class="m-col">
+        <div class="hide-panel" style="position:static;">
+          <h3 class="hide-title" style="font-size:15px;text-align:center;">إخفاء/اظهار copy</h3>
           <div id="toggleRowsMobile"></div>
         </div>
         <hr>
-        <div class="two-cols">
-          <button class="action-btn save-btn" style="height:42px; font-size:20px; margin:0;">حفظ</button>
-          <button class="action-btn" style="height:42px; font-size:20px;">شراء</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+          <button class="big-btn save m-sm">حفظ</button>
+          <button class="big-btn buy m-sm">شراء</button>
         </div>
       </div>
     </div></section>
   </main>
 
-  <div class="toast" id="saveToast">تم حفظ التصميم</div>
+  <div class="toast" id="toast">تم حفظ التصميم</div>
 
   <div class="modal" id="termsModal">
     <div class="modal-card">
       <h3>شروط التخصيص</h3>
-      <p>اكتب شروط التخصيص هنا (قابلة للتعديل لاحقًا).</p>
-      <button class="btn" id="closeTerms" type="button">إغلاق</button>
+      <p>اكتب شروط التخصيص هنا.</p>
+      <button class="btn-pill" id="closeTerms" type="button">إغلاق</button>
     </div>
   </div>
 
   <div class="modal" id="buyModal">
     <div class="modal-card">
       <h3>بيانات الشراء</h3>
-      <input class="input square" id="fullName" placeholder="الاسم الكامل" style="margin-bottom:8px; direction:rtl; text-align:right;">
-      <input class="input square" id="address" placeholder="العنوان بالتفصيل" style="margin-bottom:8px; direction:rtl; text-align:right;">
-      <input class="input square" id="phone" placeholder="رقم الهاتف" style="margin-bottom:12px; direction:rtl; text-align:right;">
-      <button class="btn" id="confirmBuy" type="button">تأكيد</button>
-      <button class="btn" id="closeBuy" type="button" style="margin-right:8px;">إلغاء</button>
+      <input class="input-rect" id="fullName" placeholder="الاسم الكامل" style="margin-bottom:8px;direction:rtl;text-align:right;">
+      <input class="input-rect" id="address" placeholder="العنوان بالتفصيل" style="margin-bottom:8px;direction:rtl;text-align:right;">
+      <input class="input-rect" id="phone" placeholder="رقم الهاتف" style="margin-bottom:10px;direction:rtl;text-align:right;">
+      <button class="btn-pill" id="confirmBuy" type="button">تأكيد</button>
+      <button class="btn-pill" id="closeBuy" type="button" style="margin-top:6px;">إلغاء</button>
     </div>
   </div>
 
   <script>
+    const $ = (id) => document.getElementById(id);
+
     const state = {
       tags: ["Hashtag", "Hashtag2", "Hashtag3"],
       minTags: 3,
@@ -672,27 +514,27 @@
       hidden: { story: false, hashtag: false, more: false, comments: false, viewall: false, address: false }
     };
 
-    const ids = (id) => document.getElementById(id);
+    const usernameInput = $('usernameInput');
+    const likesInput = $('likesInput');
+    const commentsInput = $('commentsInput');
+    const captionInput = $('captionInput');
+    const locationInput = $('locationInput');
+    const musicInput = $('musicInput');
 
-    const usernameInput = ids('usernameInput');
-    const sideName = ids('sideName');
-    const postUsername = ids('postUsername');
-    const likesInput = ids('likesInput');
-    const commentsInput = ids('commentsInput');
-    const postLikes = ids('postLikes');
-    const postComments = ids('postComments');
-    const captionInput = ids('captionInput');
-    const postCaption = ids('postCaption');
-    const postHashtags = ids('postHashtags');
-    const postTagAdd = ids('postTagAdd');
-    const postTagRemove = ids('postTagRemove');
-    const locationInput = ids('locationInput');
-    const musicInput = ids('musicInput');
-    const postLocation = ids('postLocation');
-    const locationModeBtn = ids('locationModeBtn');
-    const musicModeBtn = ids('musicModeBtn');
+    const postUser = $('postUser');
+    const postLikes = $('postLikes');
+    const postComments = $('postComments');
+    const postCaption = $('postCaption');
+    const postLocation = $('postLocation');
+    const postHashes = $('postHashes');
 
-    function formatCompact(n) {
+    function parseCompact(v) {
+      const t = String(v).trim().toLowerCase();
+      if (!t) return 0;
+      if (t.endsWith('k')) return Math.round((parseFloat(t) || 0) * 1000);
+      return Math.round(parseFloat(t) || 0);
+    }
+    function toCompact(n) {
       if (n >= 1000) {
         const k = n / 1000;
         return Number.isInteger(k) ? `${k}k` : `${k.toFixed(1)}k`;
@@ -700,176 +542,179 @@
       return String(n);
     }
 
-    function parseCompact(v) {
-      const c = String(v).trim().toLowerCase();
-      if (!c) return 0;
-      if (c.endsWith('k')) return Math.round(parseFloat(c.slice(0, -1) || 0) * 1000);
-      return Math.round(parseFloat(c) || 0);
-    }
-
-    function syncBasic() {
-      const user = usernameInput.value.trim() || 'user name';
-      sideName.textContent = user;
-      postUsername.textContent = user;
+    function sync() {
+      const u = usernameInput.value.trim() || 'user name';
+      $('sideName').textContent = u;
+      postUser.textContent = u;
       postLikes.textContent = likesInput.value || '9.5k';
       postComments.textContent = commentsInput.value || '5k';
       postCaption.textContent = captionInput.value || 'The caption';
       postLocation.textContent = state.useMusic
         ? (musicInput.value.trim() || 'Title, music')
         : (locationInput.value.trim() || 'Title, music');
-      renderPostTags();
+      renderHashPreview();
     }
 
-    usernameInput.addEventListener('input', syncBasic);
-    likesInput.addEventListener('input', syncBasic);
-    commentsInput.addEventListener('input', syncBasic);
-    captionInput.addEventListener('input', syncBasic);
-    locationInput.addEventListener('input', syncBasic);
-    musicInput.addEventListener('input', syncBasic);
+    usernameInput.addEventListener('input', sync);
+    likesInput.addEventListener('input', sync);
+    commentsInput.addEventListener('input', sync);
+    captionInput.addEventListener('input', sync);
+    locationInput.addEventListener('input', sync);
+    musicInput.addEventListener('input', sync);
 
     postLikes.addEventListener('input', () => likesInput.value = postLikes.textContent.replace(/[^\dk.]/ig, ''));
     postComments.addEventListener('input', () => commentsInput.value = postComments.textContent.replace(/[^\dk.]/ig, ''));
     postCaption.addEventListener('input', () => captionInput.value = postCaption.textContent);
 
-    document.querySelectorAll('.num-arrows button').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const target = btn.dataset.target === 'likes' ? likesInput : commentsInput;
-        const next = Math.max(0, parseCompact(target.value) + Number(btn.dataset.step));
-        target.value = formatCompact(next);
-        syncBasic();
+    document.querySelectorAll('.num-arrows button').forEach((b) => {
+      b.addEventListener('click', () => {
+        const target = b.dataset.target === 'likes' ? likesInput : commentsInput;
+        const next = Math.max(0, parseCompact(target.value) + Number(b.dataset.step));
+        target.value = toCompact(next);
+        sync();
       });
     });
 
     function renderTagInputs() {
-      const wrap = ids('tagInputs');
-      wrap.innerHTML = '';
-      state.tags.forEach((value, i) => {
+      const box = $('tagInputs');
+      box.innerHTML = '';
+      state.tags.forEach((val, i) => {
         const row = document.createElement('div');
         row.className = 'tag-row';
-        row.innerHTML = `<input class="input square" data-tag-index="${i}" value="${value}" />`;
-        if (i === state.tags.length - 1) {
-          if (state.tags.length < state.maxTags) {
-            const add = document.createElement('button');
-            add.className = 'mini-btn';
-            add.type = 'button';
-            add.textContent = '＋';
-            add.onclick = () => { state.tags.push(`Hashtag${state.tags.length + 1}`); renderTagInputs(); syncBasic(); };
-            row.append(add);
-          }
-          if (state.tags.length > state.minTags) {
-            const rm = document.createElement('button');
-            rm.className = 'mini-btn';
-            rm.type = 'button';
-            rm.textContent = '✕';
-            rm.onclick = () => { state.tags.pop(); renderTagInputs(); syncBasic(); };
-            row.append(rm);
-          }
-        }
-        wrap.append(row);
-      });
 
-      wrap.querySelectorAll('[data-tag-index]').forEach((inp) => {
+        const inp = document.createElement('input');
+        inp.className = 'input-rect';
+        inp.value = val;
+        inp.dataset.idx = String(i);
         inp.addEventListener('input', () => {
-          const idx = Number(inp.dataset.tagIndex);
-          state.tags[idx] = inp.value.replace(/^#*/, '');
-          syncBasic();
+          state.tags[i] = inp.value.replace(/^#*/, '');
+          sync();
         });
+        row.append(inp);
+
+        if (i === state.tags.length - 1 && state.tags.length < state.maxTags) {
+          const add = document.createElement('button');
+          add.className = 'circle-btn';
+          add.type = 'button';
+          add.textContent = '＋';
+          add.onclick = () => {
+            state.tags.push(`Hashtag${state.tags.length + 1}`);
+            renderTagInputs();
+            sync();
+          };
+          row.append(add);
+        }
+
+        if (i === state.tags.length - 1 && state.tags.length > state.minTags) {
+          const rm = document.createElement('button');
+          rm.className = 'circle-btn';
+          rm.type = 'button';
+          rm.textContent = '✕';
+          rm.onclick = () => {
+            state.tags.pop();
+            renderTagInputs();
+            sync();
+          };
+          row.append(rm);
+        }
+
+        box.append(row);
       });
 
-      postTagAdd.hidden = !(state.tags.length < state.maxTags);
-      postTagRemove.hidden = !(state.tags.length > state.minTags);
+      $('postTagAdd').hidden = !(state.tags.length < state.maxTags);
+      $('postTagRemove').hidden = !(state.tags.length > state.minTags);
     }
 
-    function renderPostTags() {
-      postHashtags.innerHTML = state.tags.map((t) => `<span>#${(t || '').replace(/^#*/, '')}</span>`).join('');
+    function renderHashPreview() {
+      postHashes.innerHTML = state.tags.map((t) => `<span>#${(t || '').replace(/^#*/, '')}</span>`).join('');
     }
 
-    postTagAdd.addEventListener('click', () => {
+    $('postTagAdd').onclick = () => {
       if (state.tags.length < state.maxTags) {
         state.tags.push(`Hashtag${state.tags.length + 1}`);
         renderTagInputs();
-        syncBasic();
+        sync();
       }
-    });
-    postTagRemove.addEventListener('click', () => {
+    };
+    $('postTagRemove').onclick = () => {
       if (state.tags.length > state.minTags) {
         state.tags.pop();
         renderTagInputs();
-        syncBasic();
+        sync();
       }
-    });
+    };
 
-    function syncModeButtons() {
+    function renderModeButtons() {
       if (state.useMusic) {
-        musicModeBtn.textContent = '✕';
-        locationModeBtn.textContent = '＋';
+        $('musicMode').textContent = '✕';
+        $('locationMode').textContent = '＋';
       } else {
-        musicModeBtn.textContent = '＋';
-        locationModeBtn.textContent = '✕';
+        $('musicMode').textContent = '＋';
+        $('locationMode').textContent = '✕';
       }
-      syncBasic();
     }
-    locationModeBtn.onclick = () => { if (state.useMusic) { state.useMusic = false; syncModeButtons(); } };
-    musicModeBtn.onclick = () => { if (!state.useMusic) { state.useMusic = true; syncModeButtons(); } };
+    $('musicMode').onclick = () => { if (!state.useMusic) { state.useMusic = true; renderModeButtons(); sync(); } };
+    $('locationMode').onclick = () => { if (state.useMusic) { state.useMusic = false; renderModeButtons(); sync(); } };
 
-    ids('uploadBtn').addEventListener('click', () => ids('profileInput').click());
-    ids('profileInput').addEventListener('change', (e) => {
+    $('uploadBtn').onclick = () => $('profileInput').click();
+    $('profileInput').addEventListener('change', (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
       const url = URL.createObjectURL(file);
-      ['sidePreviewImg', 'postProfileImg'].forEach((id) => {
-        const img = ids(id);
+      ['sideAvatar', 'postAvatar'].forEach((id) => {
+        const img = $(id);
         img.src = url;
         img.classList.add('show');
       });
     });
 
-    const toggleConfig = [
-      ['Stories', 'القصص', 'story', () => ids('postStoryRing')],
-      ['Hashtag', 'هاشتاج', 'hashtag', () => ids('postHashtags').parentElement],
-      ['More', 'المزيد', 'more', () => ids('moreBtn')],
-      ['Comments', 'تعليقات', 'comments', () => ids('postComments').parentElement],
-      ['View all', 'عرض الكل', 'viewall', () => ids('post').querySelector('.comments')],
-      ['address', 'المكان', 'address', () => ids('postLocation')],
+    const toggles = [
+      ['Stories','القصص','story',()=>$('storyRing'), 'eyeStory'],
+      ['Hashtag','هاشتاج','hashtag',()=>$('postHashes').parentElement, 'eyeHash'],
+      ['More','المزيد','more',()=>$('moreBtn'), 'eyeMore'],
+      ['Comments','تعليقات','comments',()=>$('postComments').parentElement, 'eyeComments'],
+      ['View all','عرض الكل','viewall',()=>$('viewAllLine'), 'eyeViewall'],
+      ['address','المكان','address',()=>$('postLocation'), 'eyeAddress']
     ];
 
-    function renderToggles(containerId) {
-      const c = ids(containerId);
-      c.innerHTML = '';
-      toggleConfig.forEach(([en, ar, key]) => {
+    function buildToggleRows(id) {
+      const root = $(id);
+      root.innerHTML = '';
+      toggles.forEach(([en, ar, key]) => {
         const row = document.createElement('div');
         row.className = 'toggle-row';
-        row.innerHTML = `<span>${ar}</span><button class="switch ${state.hidden[key] ? '' : 'on'}" data-key="${key}"></button><span style="direction:ltr;text-align:left;">${en}</span>`;
-        c.append(row);
+        row.innerHTML = `<span>${ar}</span><button class="switch ${state.hidden[key] ? '' : 'on'}" data-k="${key}"></button><span class="en">${en}</span>`;
+        root.append(row);
       });
-      c.querySelectorAll('.switch').forEach(sw => {
+      root.querySelectorAll('.switch').forEach((sw) => {
         sw.addEventListener('click', () => {
-          const key = sw.dataset.key;
+          const key = sw.dataset.k;
           state.hidden[key] = !state.hidden[key];
-          applyVisibility();
-          renderToggles(containerId);
-          if (containerId === 'toggleRows') renderToggles('toggleRowsMobile');
-          if (containerId === 'toggleRowsMobile') renderToggles('toggleRows');
+          applyHide();
+          buildToggleRows('toggleRows');
+          buildToggleRows('toggleRowsMobile');
         });
       });
     }
 
-    function applyVisibility() {
-      toggleConfig.forEach(([, , key, getter]) => {
-        const el = getter();
-        el.style.opacity = state.hidden[key] ? 0.22 : 1;
-        const mark = ids('mark' + key.charAt(0).toUpperCase() + key.slice(1));
-        if (mark) {
-          ids('hideOverlay').style.display = 'block';
-          mark.style.display = state.hidden[key] ? 'block' : 'none';
-        }
+    function applyHide() {
+      toggles.forEach(([, , key, getEl, eyeId]) => {
+        getEl().style.opacity = state.hidden[key] ? .2 : 1;
+        $(eyeId).style.display = state.hidden[key] ? 'block' : 'none';
       });
+      $('storyRing').classList.toggle('no-story', state.hidden.story);
     }
 
-    ids('hideClose').onclick = () => ids('hideCard').classList.add('collapsed');
-    ids('triangleToggle').onclick = () => ids('hideCard').classList.toggle('collapsed');
+    $('hideClose').onclick = () => $('hidePanel').classList.add('collapsed');
+    $('togglePanel').onclick = () => $('hidePanel').classList.toggle('collapsed');
 
-    ids('saveDesignBtn').onclick = () => {
+    $('extractInput').addEventListener('change', () => {
+      // Hook: اربط هنا API استخراج بيانات إنستجرام
+      usernameInput.value = $('extractInput').value.trim();
+      sync();
+    });
+
+    $('saveBtn').onclick = () => {
       const payload = {
         username: usernameInput.value,
         likes: likesInput.value,
@@ -881,42 +726,34 @@
         mode: state.useMusic ? 'music' : 'location',
         hidden: state.hidden
       };
-      localStorage.setItem('mirrorCustomizerDraft', JSON.stringify(payload));
-      const t = ids('saveToast');
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 1600);
+      localStorage.setItem('mirror_customizer', JSON.stringify(payload));
+      $('toast').classList.add('show');
+      setTimeout(() => $('toast').classList.remove('show'), 1400);
     };
 
-    ids('termsBtn').onclick = () => ids('termsModal').classList.add('show');
-    ids('closeTerms').onclick = () => ids('termsModal').classList.remove('show');
+    $('termsBtn').onclick = () => $('termsModal').classList.add('show');
+    $('closeTerms').onclick = () => $('termsModal').classList.remove('show');
 
-    ids('buyBtn').onclick = () => ids('buyModal').classList.add('show');
-    ids('closeBuy').onclick = () => ids('buyModal').classList.remove('show');
-    ids('confirmBuy').onclick = () => {
-      ids('buyModal').classList.remove('show');
-      alert('تم ارسال طلبك وسيتم مراجعته والتواصل معك لتأكيد عمليه الشراء قريباً');
+    $('buyBtn').onclick = () => $('buyModal').classList.add('show');
+    $('closeBuy').onclick = () => $('buyModal').classList.remove('show');
+    $('confirmBuy').onclick = () => {
+      $('buyModal').classList.remove('show');
+      alert('تم ارسال طلبك وسيتم مراجعته والتواصل معك لتأكيد عمليه الشراء قريبا');
     };
 
-    ids('extractInput').addEventListener('change', () => {
-      // نقطة ربط للباك إند: إدخال اسم المستخدم واستدعاء API لاستخراج البيانات.
-      usernameInput.value = ids('extractInput').value.trim();
-      syncBasic();
-    });
-
-    function initMobileClone() {
-      const clone = ids('post').cloneNode(true);
-      clone.id = 'postCloneMobileInternal';
-      clone.style.height = '100%';
-      ids('postMobileClone').replaceWith(clone);
-    }
+    // mobile post clone (visual only, no duplicate ids)
+    (() => {
+      const clone = $('post').cloneNode(true);
+      clone.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+      $('mobilePost').replaceWith(clone);
+    })();
 
     renderTagInputs();
-    renderToggles('toggleRows');
-    renderToggles('toggleRowsMobile');
-    syncModeButtons();
-    syncBasic();
-    applyVisibility();
-    initMobileClone();
+    renderModeButtons();
+    buildToggleRows('toggleRows');
+    buildToggleRows('toggleRowsMobile');
+    applyHide();
+    sync();
   </script>
 </body>
 </html>

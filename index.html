@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instagram Mirror Customizer</title>
+  <style>
+    :root {
+      --bg: #c7c7c9;
+      --panel-bg: #f9f9fa;
+      --post-bg: #fdfdfd;
+      --ink: #111;
+      --muted: #7d7d80;
+      --link: #1864a3;
+      --blue: #6aa7db;
+      --accent-grad: linear-gradient(130deg, #f9c450 0%, #f77737 25%, #e1306c 55%, #8a3ab9 80%, #405de6 100%);
+      --surface-border: 1.5px;
+      --radius-xl: 28px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+      --font: "Cairo", "Segoe UI", Tahoma, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; font-family: var(--font); }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+    body { background: var(--bg); color: var(--ink); }
+
+    .page {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 27% 43% 30%;
+      gap: 18px;
+      padding: 16px;
+    }
+
+    .grad-frame {
+      position: relative;
+      border-radius: var(--radius-xl);
+      background: var(--accent-grad);
+      padding: var(--surface-border);
+      overflow: hidden;
+    }
+    .grad-frame > .inner {
+      background: var(--panel-bg);
+      border-radius: calc(var(--radius-xl) - 2px);
+      width: 100%;
+      height: 100%;
+    }
+
+    .custom-panel .inner {
+      padding: 14px 18px;
+      display: grid;
+      grid-template-rows: auto auto auto auto auto auto 1fr;
+      gap: 10px;
+    }
+
+    .title { margin: 0; text-align: center; font-size: clamp(20px, 2.2vw, 42px); line-height: 1.1; }
+    .subline { margin: 0; font-size: 14px; text-align: center; color: #3a3a3c; }
+
+    .profile-upload {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile-preview {
+      text-align: center;
+      color: #9ea0a4;
+    }
+    .profile-circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      margin: 4px auto 8px;
+      border: 2px solid transparent;
+      background: linear-gradient(#d7dbe0, #d7dbe0) padding-box, var(--accent-grad) border-box;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .profile-circle img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .profile-circle img.show { display: block; }
+
+    .btn, .input, .toggle-btn {
+      border: 1px solid #5e98c8;
+      background: #d8dde3;
+      border-radius: 999px;
+      min-height: 40px;
+      font-size: clamp(17px, 1.35vw, 42px);
+      color: #5d6064;
+      outline: none;
+    }
+    .btn { cursor: pointer; padding: 0 20px; }
+    .btn:hover { filter: brightness(0.97); }
+    .btn:active { transform: translateY(1px); }
+
+    .input {
+      width: 100%;
+      padding: 0 14px;
+      direction: ltr;
+      text-align: center;
+    }
+    .input.square { border-radius: 0; }
+    .hint { margin: 2px 0 0; font-size: 13px; text-align: center; }
+    .hint.link-like button {
+      color: var(--link); border: 0; background: transparent; text-decoration: underline; cursor: pointer;
+      padding: 0; font-size: inherit;
+    }
+    hr {
+      border: 0;
+      border-top: 1px solid #222;
+      margin: 4px 0;
+    }
+
+    .two-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .num-group { text-align: center; }
+    .num-group .label { font-size: clamp(13px, 1vw, 26px); line-height: 1.1; margin: 0 0 4px; }
+    .num-control {
+      display: grid;
+      grid-template-columns: 16px 1fr;
+      gap: 6px;
+      align-items: center;
+      direction: ltr;
+    }
+    .num-arrows {
+      display: grid;
+      grid-auto-rows: 1fr;
+      line-height: 0.8;
+      font-weight: 700;
+      user-select: none;
+      text-align: center;
+    }
+    .num-arrows button {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+      color: #111;
+      line-height: 0.75;
+    }
+
+    .tags-grid { display: grid; gap: 6px; }
+    .tag-row { display: grid; grid-template-columns: 1fr auto auto; gap: 4px; }
+    .mini-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid #5e98c8;
+      background: #e9eff5;
+      color: #1b70b7;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      padding: 0;
+    }
+
+    .post-wrap {
+      display: grid;
+      place-items: center;
+    }
+    .post {
+      width: min(88%, 700px);
+      height: calc(100vh - 56px);
+      max-height: 1120px;
+      border: 1.4px solid transparent;
+      background: linear-gradient(var(--post-bg), var(--post-bg)) padding-box, var(--accent-grad) border-box;
+      padding: 18px 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .post-header {
+      direction: ltr;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: start;
+      gap: 10px;
+    }
+    .post-profile {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      padding: 2px;
+      background: var(--accent-grad);
+      position: relative;
+    }
+    .post-profile.no-story { background: #c0c3c8; }
+    .post-profile img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid #f5f5f6;
+      object-fit: cover;
+    }
+    .head-txt { align-self: center; }
+    .head-txt .name { font-weight: 700; font-size: clamp(18px, 1.5vw, 34px); }
+    .head-txt .loc { font-size: clamp(13px, 1.1vw, 22px); color: #222; }
+
+    .more-btn {
+      border: 0;
+      background: transparent;
+      font-size: 42px;
+      line-height: 0.7;
+      color: #93959a;
+      cursor: pointer;
+      padding: 0 6px;
+    }
+
+    .mirror {
+      margin: 18px auto 14px;
+      width: 78%;
+      aspect-ratio: 1 / 1.2;
+      background: linear-gradient(180deg, #cee3f1 0%, #75b8e9 55%, #2f99e3 100%);
+      display: grid;
+      place-items: center;
+      color: #47a1e4;
+      text-align: center;
+      font-size: clamp(32px, 4vw, 74px);
+      line-height: 1.25;
+      user-select: none;
+    }
+
+    .actions {
+      direction: ltr;
+      display: grid;
+      grid-template-columns: auto auto auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      margin: 8px 0;
+    }
+    .icon-btn {
+      border: 0;
+      background: transparent;
+      width: 56px;
+      height: 56px;
+      padding: 4px;
+      cursor: pointer;
+    }
+    .icon-btn img { width: 100%; height: 100%; object-fit: contain; }
+
+    .post-txt { direction: ltr; font-size: clamp(22px, 1.85vw, 36px); }
+    .likes { margin: 4px 0 8px; }
+    .caption-line { line-height: 1.15; }
+    .caption-line .shop { color: var(--link); margin-right: 6px; }
+    .hashtags span { color: var(--link); margin-right: 6px; }
+    .comments { color: var(--muted); margin-top: 3px; }
+    .editable { outline: none; border-radius: 4px; padding: 0 2px; }
+    .editable:focus { background: #eef5fb; }
+
+    .hide-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: none;
+    }
+    .hidden-mark {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      opacity: 0.55;
+      display: none;
+    }
+
+    .right-column {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto auto;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .hide-card {
+      position: relative;
+      border: 1px solid #4d8dc1;
+      background: #eef6fd;
+      padding: 10px;
+      transition: transform .25s ease, opacity .25s ease;
+    }
+    .hide-card.collapsed {
+      transform: translateX(88%);
+      opacity: 0.8;
+    }
+    .hide-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .hide-title { margin: 0; font-size: clamp(18px, 1.6vw, 28px); }
+    .close-x {
+      border: 0;
+      background: transparent;
+      color: #1f73b5;
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 1;
+    }
+    .triangle-toggle {
+      position: absolute;
+      left: -22px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 44px;
+      border: 1px solid #4d8dc1;
+      border-right: 0;
+      background: #eef6fd;
+      clip-path: polygon(100% 0, 0 50%, 100% 100%);
+      cursor: pointer;
+    }
+    .hide-card.collapsed .triangle-toggle { clip-path: polygon(0 0, 100% 50%, 0 100%); left: -20px; }
+
+    .toggle-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+      font-size: clamp(15px, 1.1vw, 22px);
+      margin-bottom: 4px;
+    }
+    .switch {
+      width: 52px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid #5f9acc;
+      background: #d2deea;
+      position: relative;
+      cursor: pointer;
+    }
+    .switch::after {
+      content: "";
+      width: 18px;
+      height: 18px;
+      background: #6ea8d6;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform .18s ease;
+    }
+    .switch.on::after { transform: translateX(28px); background: #f45f74; }
+
+    .extract { text-align: center; }
+    .extract .grad-frame { padding: 1.2px; border-radius: 20px; }
+    .extract .inner {
+      border-radius: 19px;
+      display: grid;
+      grid-template-columns: 55% 45%;
+      align-items: center;
+      min-height: 66px;
+      padding: 0 10px;
+    }
+
+    .actions-bottom { margin-top: auto; }
+    .action-btn {
+      width: 100%;
+      height: 74px;
+      border: 1px solid #1ed22f;
+      background: #88d587;
+      color: #fff;
+      font-size: clamp(32px, 2.4vw, 52px);
+      cursor: pointer;
+    }
+    .save-btn {
+      background: #7075c0;
+      border-color: #39e63e;
+      margin-bottom: 8px;
+    }
+
+    .terms-note { text-align: center; margin: 4px 0 0; }
+    .terms-note button { border: 0; background: transparent; color: #2c66b2; text-decoration: underline; cursor: pointer; }
+
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1f1f22;
+      color: #fff;
+      border-radius: 12px;
+      padding: 10px 22px;
+      transition: transform .3s ease;
+      z-index: 20;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      background: #0006;
+      place-items: center;
+      z-index: 30;
+      padding: 20px;
+    }
+    .modal.show { display: grid; }
+    .modal-card {
+      background: #fff;
+      width: min(560px, 95vw);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .mobile-root { display: none; }
+
+    @media (max-width: 999px) {
+      .page { display: none; }
+      .mobile-root {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        height: 100vh;
+        overflow: hidden;
+        padding: 10px;
+        gap: 8px;
+      }
+      .mobile-root .extract { direction: rtl; }
+      .mobile-root .post {
+        width: min(95vw, 620px);
+        height: auto;
+        min-height: 44vh;
+        max-height: 56vh;
+      }
+      .mobile-bottom {
+        height: 34vh;
+      }
+      .mobile-bottom .inner {
+        display: grid;
+        grid-template-columns: 34% 32% 34%;
+        gap: 8px;
+        padding: 8px;
+        font-size: 13px;
+      }
+      .mob-col { overflow: hidden; display: grid; align-content: start; gap: 6px; }
+      .mobile-bottom hr.v { border: 0; border-left: 1px solid #111; height: 100%; margin: 0; }
+      .small { min-height: 30px; font-size: 13px; }
+      .hide-card { border: 1px solid #4d8dc1; padding: 4px; background: #eef6fd; }
+      .hide-header, .close-x, .triangle-toggle { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page" id="desktopPage">
+    <section class="grad-frame custom-panel">
+      <div class="inner">
+        <h1 class="title">تفاصيل التخصيص</h1>
+
+        <div class="profile-upload">
+          <div>
+            <button class="btn" id="uploadBtn" type="button">Upload</button>
+            <input type="file" id="profileInput" accept="image/*" hidden />
+            <p class="hint link-like">ارفع الصورة المراد وضعها او <button type="button">استخرجها عن طريق اسم المستخدم</button></p>
+            <input class="input" id="usernameInput" placeholder="user_name" />
+            <p class="hint" style="text-decoration: underline; font-style: italic;">ضع الاسم بشكل صحيح</p>
+          </div>
+          <div class="profile-preview">
+            <small>ستظهر الصورة هنا</small>
+            <div class="profile-circle"><img id="sidePreviewImg" alt="profile" /></div>
+            <div id="sideName">سيظهر الاسم هنا</div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="two-cols">
+          <div class="num-group">
+            <p class="label">عدد التعليقات<br>Number of comments</p>
+            <div class="num-control">
+              <div class="num-arrows">
+                <button type="button" data-target="comments" data-step="500">˄</button>
+                <button type="button" data-target="comments" data-step="-500">˅</button>
+              </div>
+              <input class="input" id="commentsInput" value="5k" />
+            </div>
+          </div>
+
+          <div class="num-group">
+            <p class="label">عدد الإعجابات<br>Number of likes</p>
+            <div class="num-control">
+              <div class="num-arrows">
+                <button type="button" data-target="likes" data-step="500">˄</button>
+                <button type="button" data-target="likes" data-step="-500">˅</button>
+              </div>
+              <input class="input" id="likesInput" value="9.5k" />
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div>
+          <p class="subline" style="text-decoration: underline; text-align:right;">اكتب العنوان المراد</p>
+          <input class="input square" id="captionInput" placeholder="Caption" />
+          <p class="hint">يفضل الا يتجاوز الخمس كلمات</p>
+        </div>
+
+        <hr>
+
+        <div>
+          <p class="subline" style="text-decoration: underline; text-align:right;">اكتب الهاشتاج المراد</p>
+          <div class="tags-grid" id="tagInputs"></div>
+          <p class="hint">لا يمكن وضع اكثر من 5 علامات هاش</p>
+        </div>
+
+        <hr>
+
+        <div>
+          <p class="subline" style="text-decoration: underline; text-align:right;">المكان/الموسيقى</p>
+          <div class="tag-row">
+            <input class="input square" id="locationInput" placeholder="Example: Egypt, Cairo" />
+            <button class="mini-btn" id="locationModeBtn" type="button">✕</button>
+          </div>
+          <div class="tag-row">
+            <input class="input square" id="musicInput" placeholder="Example: TUL8TE • LA3BALY FE DMA" />
+            <button class="mini-btn" id="musicModeBtn" type="button">＋</button>
+          </div>
+          <p class="hint">يمكنك اختيار مكان او موسيقى لا يمكن وضع الخيارين</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="post-wrap">
+      <article class="post" id="post">
+        <div class="post-header">
+          <div class="post-profile" id="postStoryRing"><img id="postProfileImg" alt="profile"></div>
+          <div class="head-txt">
+            <div class="name" id="postUsername">user name</div>
+            <div class="loc editable" id="postLocation" contenteditable="true">Title, music</div>
+          </div>
+          <button class="more-btn" id="moreBtn" type="button">⋮</button>
+        </div>
+
+        <div class="mirror" id="mirrorBlock">مراية<br>Mirror</div>
+
+        <div class="actions">
+          <button class="icon-btn"><img src="assets/icons/like.svg" alt="like"></button>
+          <button class="icon-btn"><img src="assets/icons/comment.svg" alt="comment"></button>
+          <button class="icon-btn"><img src="assets/icons/share.svg" alt="share"></button>
+          <span></span>
+          <button class="icon-btn"><img src="assets/icons/save.svg" alt="save"></button>
+        </div>
+
+        <div class="post-txt">
+          <div class="likes"><span class="editable" id="postLikes" contenteditable="true">9.5k</span> Likes</div>
+          <div class="caption-line">
+            <span class="editable" id="postCaption" contenteditable="true">The caption</span>
+            <span class="shop">@t_sign.shop</span>
+            <span class="hashtags" id="postHashtags"></span>
+            <button class="mini-btn" id="postTagAdd" type="button">＋</button>
+            <button class="mini-btn" id="postTagRemove" type="button" hidden>✕</button>
+          </div>
+          <div class="comments">View All <span class="editable" id="postComments" contenteditable="true">5k</span> Comments</div>
+        </div>
+
+        <div class="hide-overlay" id="hideOverlay">
+          <img class="hidden-mark" id="markStory" style="top:12px;left:6px" src="assets/icons/hidden-eye.svg" alt="hidden">
+          <img class="hidden-mark" id="markHash" style="bottom:112px;left:8px" src="assets/icons/hidden-eye.svg" alt="hidden">
+          <img class="hidden-mark" id="markMore" style="top:14px;right:12px" src="assets/icons/hidden-eye.svg" alt="hidden">
+          <img class="hidden-mark" id="markComments" style="bottom:70px;left:8px" src="assets/icons/hidden-eye.svg" alt="hidden">
+          <img class="hidden-mark" id="markViewAll" style="bottom:26px;left:8px" src="assets/icons/hidden-eye.svg" alt="hidden">
+          <img class="hidden-mark" id="markAddress" style="top:66px;left:178px" src="assets/icons/hidden-eye.svg" alt="hidden">
+        </div>
+      </article>
+    </section>
+
+    <aside class="right-column">
+      <div class="hide-card" id="hideCard">
+        <button class="triangle-toggle" id="triangleToggle" type="button" aria-label="toggle panel"></button>
+        <div class="hide-header">
+          <h3 class="hide-title">إخفاء/اظهار</h3>
+          <button class="close-x" id="hideClose" type="button">✕</button>
+        </div>
+        <div id="toggleRows"></div>
+      </div>
+
+      <section class="extract">
+        <h2 class="title" style="font-size: clamp(22px, 2vw, 38px);">Extracting data from Instagram<br>استخراج البيانات من الإنستجرام</h2>
+        <div class="grad-frame">
+          <div class="inner">
+            <p class="hint" style="margin:0; text-align:right; font-size:22px; text-decoration: underline;">ضع الاسم بشكل صحيح<br>كما موضح في انستجرام</p>
+            <input class="input" id="extractInput" placeholder="user_name">
+          </div>
+        </div>
+      </section>
+
+      <div class="actions-bottom">
+        <button class="action-btn save-btn" id="saveDesignBtn" type="button">حفظ</button>
+        <button class="action-btn" id="buyBtn" type="button">شراء</button>
+        <p class="terms-note">يجب مراعاه <button type="button" id="termsBtn">شروط التخصيص</button></p>
+      </div>
+    </aside>
+  </main>
+
+  <main class="mobile-root" id="mobilePage">
+    <section class="extract">
+      <h2 class="title" style="font-size: 28px;">Extracting data from Instagram<br>استخراج البيانات من الإنستجرام</h2>
+      <div class="grad-frame"><div class="inner"><input class="input small" placeholder="user_name"><p class="hint">ضع الاسم بشكل صحيح</p></div></div>
+    </section>
+
+    <section class="post-wrap"><article class="post" id="postMobileClone"></article></section>
+
+    <section class="grad-frame mobile-bottom"><div class="inner">
+      <div class="mob-col">
+        <p class="subline" style="text-decoration: underline; text-align:right;">اكتب العنوان المراد</p>
+        <input class="input square small" placeholder="Caption">
+        <hr>
+        <p class="subline" style="text-decoration: underline; text-align:right;">اكتب الهاشتاج المراد</p>
+        <input class="input square small" placeholder="Hashtag">
+        <hr>
+        <div class="two-cols" style="gap:6px;">
+          <div><small>عدد التعليقات</small><input class="input small" value="5k"></div>
+          <div><small>عدد الإعجابات</small><input class="input small" value="9.5k"></div>
+        </div>
+      </div>
+      <hr class="v">
+      <div class="mob-col">
+        <button class="btn small">Upload</button>
+        <input class="input small" placeholder="user_name">
+        <hr>
+        <small style="text-align:center; text-decoration: underline;">المكان/الموسيقى</small>
+        <input class="input square small" placeholder="Example: Egypt, Cairo">
+        <input class="input square small" placeholder="Example: TUL8TE • LA3BALY FE DMA">
+      </div>
+      <hr class="v">
+      <div class="mob-col">
+        <div class="hide-card" style="position:static;">
+          <h3 class="hide-title" style="font-size:17px; text-align:center; margin-bottom:4px;">إخفاء/اظهار copy</h3>
+          <div id="toggleRowsMobile"></div>
+        </div>
+        <hr>
+        <div class="two-cols">
+          <button class="action-btn save-btn" style="height:42px; font-size:20px; margin:0;">حفظ</button>
+          <button class="action-btn" style="height:42px; font-size:20px;">شراء</button>
+        </div>
+      </div>
+    </div></section>
+  </main>
+
+  <div class="toast" id="saveToast">تم حفظ التصميم</div>
+
+  <div class="modal" id="termsModal">
+    <div class="modal-card">
+      <h3>شروط التخصيص</h3>
+      <p>اكتب شروط التخصيص هنا (قابلة للتعديل لاحقًا).</p>
+      <button class="btn" id="closeTerms" type="button">إغلاق</button>
+    </div>
+  </div>
+
+  <div class="modal" id="buyModal">
+    <div class="modal-card">
+      <h3>بيانات الشراء</h3>
+      <input class="input square" id="fullName" placeholder="الاسم الكامل" style="margin-bottom:8px; direction:rtl; text-align:right;">
+      <input class="input square" id="address" placeholder="العنوان بالتفصيل" style="margin-bottom:8px; direction:rtl; text-align:right;">
+      <input class="input square" id="phone" placeholder="رقم الهاتف" style="margin-bottom:12px; direction:rtl; text-align:right;">
+      <button class="btn" id="confirmBuy" type="button">تأكيد</button>
+      <button class="btn" id="closeBuy" type="button" style="margin-right:8px;">إلغاء</button>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      tags: ["Hashtag", "Hashtag2", "Hashtag3"],
+      minTags: 3,
+      maxTags: 5,
+      useMusic: false,
+      hidden: { story: false, hashtag: false, more: false, comments: false, viewall: false, address: false }
+    };
+
+    const ids = (id) => document.getElementById(id);
+
+    const usernameInput = ids('usernameInput');
+    const sideName = ids('sideName');
+    const postUsername = ids('postUsername');
+    const likesInput = ids('likesInput');
+    const commentsInput = ids('commentsInput');
+    const postLikes = ids('postLikes');
+    const postComments = ids('postComments');
+    const captionInput = ids('captionInput');
+    const postCaption = ids('postCaption');
+    const postHashtags = ids('postHashtags');
+    const postTagAdd = ids('postTagAdd');
+    const postTagRemove = ids('postTagRemove');
+    const locationInput = ids('locationInput');
+    const musicInput = ids('musicInput');
+    const postLocation = ids('postLocation');
+    const locationModeBtn = ids('locationModeBtn');
+    const musicModeBtn = ids('musicModeBtn');
+
+    function formatCompact(n) {
+      if (n >= 1000) {
+        const k = n / 1000;
+        return Number.isInteger(k) ? `${k}k` : `${k.toFixed(1)}k`;
+      }
+      return String(n);
+    }
+
+    function parseCompact(v) {
+      const c = String(v).trim().toLowerCase();
+      if (!c) return 0;
+      if (c.endsWith('k')) return Math.round(parseFloat(c.slice(0, -1) || 0) * 1000);
+      return Math.round(parseFloat(c) || 0);
+    }
+
+    function syncBasic() {
+      const user = usernameInput.value.trim() || 'user name';
+      sideName.textContent = user;
+      postUsername.textContent = user;
+      postLikes.textContent = likesInput.value || '9.5k';
+      postComments.textContent = commentsInput.value || '5k';
+      postCaption.textContent = captionInput.value || 'The caption';
+      postLocation.textContent = state.useMusic
+        ? (musicInput.value.trim() || 'Title, music')
+        : (locationInput.value.trim() || 'Title, music');
+      renderPostTags();
+    }
+
+    usernameInput.addEventListener('input', syncBasic);
+    likesInput.addEventListener('input', syncBasic);
+    commentsInput.addEventListener('input', syncBasic);
+    captionInput.addEventListener('input', syncBasic);
+    locationInput.addEventListener('input', syncBasic);
+    musicInput.addEventListener('input', syncBasic);
+
+    postLikes.addEventListener('input', () => likesInput.value = postLikes.textContent.replace(/[^\dk.]/ig, ''));
+    postComments.addEventListener('input', () => commentsInput.value = postComments.textContent.replace(/[^\dk.]/ig, ''));
+    postCaption.addEventListener('input', () => captionInput.value = postCaption.textContent);
+
+    document.querySelectorAll('.num-arrows button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.target === 'likes' ? likesInput : commentsInput;
+        const next = Math.max(0, parseCompact(target.value) + Number(btn.dataset.step));
+        target.value = formatCompact(next);
+        syncBasic();
+      });
+    });
+
+    function renderTagInputs() {
+      const wrap = ids('tagInputs');
+      wrap.innerHTML = '';
+      state.tags.forEach((value, i) => {
+        const row = document.createElement('div');
+        row.className = 'tag-row';
+        row.innerHTML = `<input class="input square" data-tag-index="${i}" value="${value}" />`;
+        if (i === state.tags.length - 1) {
+          if (state.tags.length < state.maxTags) {
+            const add = document.createElement('button');
+            add.className = 'mini-btn';
+            add.type = 'button';
+            add.textContent = '＋';
+            add.onclick = () => { state.tags.push(`Hashtag${state.tags.length + 1}`); renderTagInputs(); syncBasic(); };
+            row.append(add);
+          }
+          if (state.tags.length > state.minTags) {
+            const rm = document.createElement('button');
+            rm.className = 'mini-btn';
+            rm.type = 'button';
+            rm.textContent = '✕';
+            rm.onclick = () => { state.tags.pop(); renderTagInputs(); syncBasic(); };
+            row.append(rm);
+          }
+        }
+        wrap.append(row);
+      });
+
+      wrap.querySelectorAll('[data-tag-index]').forEach((inp) => {
+        inp.addEventListener('input', () => {
+          const idx = Number(inp.dataset.tagIndex);
+          state.tags[idx] = inp.value.replace(/^#*/, '');
+          syncBasic();
+        });
+      });
+
+      postTagAdd.hidden = !(state.tags.length < state.maxTags);
+      postTagRemove.hidden = !(state.tags.length > state.minTags);
+    }
+
+    function renderPostTags() {
+      postHashtags.innerHTML = state.tags.map((t) => `<span>#${(t || '').replace(/^#*/, '')}</span>`).join('');
+    }
+
+    postTagAdd.addEventListener('click', () => {
+      if (state.tags.length < state.maxTags) {
+        state.tags.push(`Hashtag${state.tags.length + 1}`);
+        renderTagInputs();
+        syncBasic();
+      }
+    });
+    postTagRemove.addEventListener('click', () => {
+      if (state.tags.length > state.minTags) {
+        state.tags.pop();
+        renderTagInputs();
+        syncBasic();
+      }
+    });
+
+    function syncModeButtons() {
+      if (state.useMusic) {
+        musicModeBtn.textContent = '✕';
+        locationModeBtn.textContent = '＋';
+      } else {
+        musicModeBtn.textContent = '＋';
+        locationModeBtn.textContent = '✕';
+      }
+      syncBasic();
+    }
+    locationModeBtn.onclick = () => { if (state.useMusic) { state.useMusic = false; syncModeButtons(); } };
+    musicModeBtn.onclick = () => { if (!state.useMusic) { state.useMusic = true; syncModeButtons(); } };
+
+    ids('uploadBtn').addEventListener('click', () => ids('profileInput').click());
+    ids('profileInput').addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      ['sidePreviewImg', 'postProfileImg'].forEach((id) => {
+        const img = ids(id);
+        img.src = url;
+        img.classList.add('show');
+      });
+    });
+
+    const toggleConfig = [
+      ['Stories', 'القصص', 'story', () => ids('postStoryRing')],
+      ['Hashtag', 'هاشتاج', 'hashtag', () => ids('postHashtags').parentElement],
+      ['More', 'المزيد', 'more', () => ids('moreBtn')],
+      ['Comments', 'تعليقات', 'comments', () => ids('postComments').parentElement],
+      ['View all', 'عرض الكل', 'viewall', () => ids('post').querySelector('.comments')],
+      ['address', 'المكان', 'address', () => ids('postLocation')],
+    ];
+
+    function renderToggles(containerId) {
+      const c = ids(containerId);
+      c.innerHTML = '';
+      toggleConfig.forEach(([en, ar, key]) => {
+        const row = document.createElement('div');
+        row.className = 'toggle-row';
+        row.innerHTML = `<span>${ar}</span><button class="switch ${state.hidden[key] ? '' : 'on'}" data-key="${key}"></button><span style="direction:ltr;text-align:left;">${en}</span>`;
+        c.append(row);
+      });
+      c.querySelectorAll('.switch').forEach(sw => {
+        sw.addEventListener('click', () => {
+          const key = sw.dataset.key;
+          state.hidden[key] = !state.hidden[key];
+          applyVisibility();
+          renderToggles(containerId);
+          if (containerId === 'toggleRows') renderToggles('toggleRowsMobile');
+          if (containerId === 'toggleRowsMobile') renderToggles('toggleRows');
+        });
+      });
+    }
+
+    function applyVisibility() {
+      toggleConfig.forEach(([, , key, getter]) => {
+        const el = getter();
+        el.style.opacity = state.hidden[key] ? 0.22 : 1;
+        const mark = ids('mark' + key.charAt(0).toUpperCase() + key.slice(1));
+        if (mark) {
+          ids('hideOverlay').style.display = 'block';
+          mark.style.display = state.hidden[key] ? 'block' : 'none';
+        }
+      });
+    }
+
+    ids('hideClose').onclick = () => ids('hideCard').classList.add('collapsed');
+    ids('triangleToggle').onclick = () => ids('hideCard').classList.toggle('collapsed');
+
+    ids('saveDesignBtn').onclick = () => {
+      const payload = {
+        username: usernameInput.value,
+        likes: likesInput.value,
+        comments: commentsInput.value,
+        caption: captionInput.value,
+        hashtags: state.tags,
+        location: locationInput.value,
+        music: musicInput.value,
+        mode: state.useMusic ? 'music' : 'location',
+        hidden: state.hidden
+      };
+      localStorage.setItem('mirrorCustomizerDraft', JSON.stringify(payload));
+      const t = ids('saveToast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1600);
+    };
+
+    ids('termsBtn').onclick = () => ids('termsModal').classList.add('show');
+    ids('closeTerms').onclick = () => ids('termsModal').classList.remove('show');
+
+    ids('buyBtn').onclick = () => ids('buyModal').classList.add('show');
+    ids('closeBuy').onclick = () => ids('buyModal').classList.remove('show');
+    ids('confirmBuy').onclick = () => {
+      ids('buyModal').classList.remove('show');
+      alert('تم ارسال طلبك وسيتم مراجعته والتواصل معك لتأكيد عمليه الشراء قريباً');
+    };
+
+    ids('extractInput').addEventListener('change', () => {
+      // نقطة ربط للباك إند: إدخال اسم المستخدم واستدعاء API لاستخراج البيانات.
+      usernameInput.value = ids('extractInput').value.trim();
+      syncBasic();
+    });
+
+    function initMobileClone() {
+      const clone = ids('post').cloneNode(true);
+      clone.id = 'postCloneMobileInternal';
+      clone.style.height = '100%';
+      ids('postMobileClone').replaceWith(clone);
+    }
+
+    renderTagInputs();
+    renderToggles('toggleRows');
+    renderToggles('toggleRowsMobile');
+    syncModeButtons();
+    syncBasic();
+    applyVisibility();
+    initMobileClone();
+  </script>
+</body>
+</html>

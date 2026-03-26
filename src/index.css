@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
+    --primary: 220 14% 20%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 14% 20%;
+    --muted: 220 10% 94%;
+    --muted-foreground: 220 8% 50%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 220 14% 20%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
+    --ring: 220 60% 50%;
+    --radius: 0.625rem;
+
+    --mirror-bg: 220 10% 92%;
+    --ig-gradient: linear-gradient(45deg,
+      hsl(35 89% 57%),
+      hsl(15 78% 57%),
+      hsl(350 72% 50%),
+      hsl(335 68% 46%),
+      hsl(315 76% 40%)
+    );
+    --mirror-gradient: linear-gradient(180deg,
+      hsl(0 0% 100%) 0%,
+      hsl(207 60% 85%) 30%,
+      hsl(207 60% 65%) 60%,
+      hsl(210 80% 45%) 100%
+    );
+    --save-color: 255 40% 58%;
+    --purchase-color: 145 45% 48%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Cairo', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .ig-border-wrap {
+    position: relative;
+    border-radius: inherit;
+  }
+  .ig-border-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: var(--ig-gradient);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .mirror-surface {
+    background: var(--mirror-gradient);
+  }
+
+  .btn-save {
+    @apply py-2.5 px-6 text-base font-semibold rounded-lg cursor-pointer transition-all duration-200;
+    background: hsl(var(--save-color));
+    color: white;
+  }
+  .btn-save:hover { opacity: 0.92; }
+  .btn-save:active { transform: scale(0.97); }
+
+  .btn-purchase {
+    @apply py-2.5 px-6 text-base font-semibold rounded-lg cursor-pointer transition-all duration-200;
+    background: transparent;
+    color: hsl(var(--purchase-color));
+    border: 2px solid hsl(var(--purchase-color));
+  }
+  .btn-purchase:hover { background: hsl(var(--purchase-color) / 0.08); }
+  .btn-purchase:active { transform: scale(0.97); }
+
+  .field-input {
+    @apply border border-border rounded-md px-2 py-1.5 text-sm bg-white outline-none transition-all duration-150;
+    font-family: 'Cairo', sans-serif;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 3px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 10px;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .field-input:focus {
+    @apply ring-2 ring-ring/30 border-ring/50;
+  }
+  .field-input:disabled {
+    @apply opacity-40 cursor-not-allowed;
+  }
+
+  .editable-inline {
+    @apply bg-transparent border-none outline-none cursor-text;
+    font-family: inherit;
+  }
+  .editable-inline:focus {
+    @apply ring-1 ring-ring/40 rounded px-1 bg-blue-50/40;
+  }
+
+  .section-label {
+    @apply text-xs font-semibold text-center text-foreground/80;
+  }
+  .hint-text {
+    @apply text-[11px] text-muted-foreground leading-snug;
+  }
+
+  .panel-card {
+    @apply bg-white rounded-2xl p-5 shadow-sm;
+    position: relative;
+  }
+  .panel-card.ig-bordered {
+    @apply rounded-2xl;
+  }
+  .panel-card.ig-bordered::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: var(--ig-gradient);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .overlay-hidden {
+    @apply absolute inset-0 flex items-center justify-center bg-white/60 z-10 rounded;
+  }
+
+  .toggle-switch {
+    @apply relative rounded-full transition-colors duration-200 cursor-pointer shrink-0;
+  }
+  .toggle-switch .toggle-dot {
+    @apply absolute rounded-full bg-white shadow-sm transition-all duration-200;
+  }
+}
